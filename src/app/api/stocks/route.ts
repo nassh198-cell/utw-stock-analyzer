@@ -17,9 +17,6 @@ export async function GET(request: NextRequest) {
 
   let filtered = [...STOCK_UNIVERSE];
 
-  // Limit to first 40 stocks for initial load performance
-  filtered = filtered.slice(0, 40);
-
   // Filter by sector
   if (sectorsParam) {
     const sectors = sectorsParam.split(",");
@@ -37,7 +34,7 @@ export async function GET(request: NextRequest) {
   }
 
   // Fetch metrics for all filtered stocks (in parallel, with concurrency limit)
-  const batchSize = 10;
+  const batchSize = 20;
   const results: StockSummary[] = [];
 
   for (let i = 0; i < filtered.length; i += batchSize) {

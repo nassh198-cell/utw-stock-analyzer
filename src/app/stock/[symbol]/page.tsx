@@ -22,6 +22,7 @@ import {
 } from "recharts";
 import ScoreBadge from "@/components/ScoreBadge";
 import { StockDetail, MetricScore } from "@/types/stock";
+import CommunitySection from "./CommunitySection";
 
 function InterpretationIcon({
   interpretation,
@@ -278,6 +279,9 @@ export default function StockDetailPage() {
               </div>
             </div>
           )}
+
+          {/* Community Section */}
+          <CommunitySection symbol={detail.symbol} companyName={detail.name} />
         </div>
 
         {/* Right: Key Metrics Summary */}
@@ -287,6 +291,10 @@ export default function StockDetailPage() {
             <h2 className="text-lg font-bold text-white mb-4">핵심 지표</h2>
             <div className="space-y-3">
               <MetricRow label="현재가" value={metrics.price ? `$${metrics.price.toFixed(2)}` : "-"} />
+              <MetricRow label="PER" value={metrics.peRatio != null ? metrics.peRatio.toFixed(1) : "-"} />
+              <MetricRow label="PBR" value={metrics.pbRatio != null ? metrics.pbRatio.toFixed(2) : "-"} />
+              <MetricRow label="배당수익률" value={metrics.dividendYield != null ? `${metrics.dividendYield.toFixed(1)}%` : "-"} />
+              <MetricRow label="EPS" value={metrics.eps != null ? `$${metrics.eps.toFixed(2)}` : "-"} />
               <MetricRow label="베타" value={metrics.beta?.toFixed(2) ?? "-"} />
               <MetricRow label="52주 변화율" value={formatPercent(metrics.fiftyTwoWeekChange)} />
             </div>
@@ -315,12 +323,14 @@ export default function StockDetailPage() {
           <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
             <h2 className="text-lg font-bold text-white mb-3">📖 평가 기준</h2>
             <div className="space-y-2 text-sm text-slate-400">
-              <p>• <strong className="text-slate-300">52주 변화율 (40%)</strong>: 하락 시 높은 점수 (저평가 신호)</p>
-              <p>• <strong className="text-slate-300">Beta (30%)</strong>: 낮을수록 안정적</p>
-              <p>• <strong className="text-slate-300">가격 안정성 (30%)</strong>: 적정 가격대 점수</p>
+              <p>• <strong className="text-slate-300">52주 변화율 (25%)</strong>: 하락 시 높은 점수 (저평가 신호)</p>
+              <p>• <strong className="text-slate-300">PER (25%)</strong>: 낮을수록 저평가 (5~15배 적정)</p>
+              <p>• <strong className="text-slate-300">PBR (20%)</strong>: 낮을수록 저평가 (0.5~1.5배 적정)</p>
+              <p>• <strong className="text-slate-300">Beta (15%)</strong>: 낮을수록 안정적</p>
+              <p>• <strong className="text-slate-300">배당수익률 (10%)</strong>: 높을수록 우량</p>
+              <p>• <strong className="text-slate-300">가격 안정성 (5%)</strong>: 적정 가격대 점수</p>
               <p className="mt-3 text-xs text-slate-500">
-                ※ Yahoo Finance API 정책으로 인해 PER, PBR 등 세부 지표는 현재 제공되지 않습니다.
-                차트 데이터 기반으로 저평가 여부를 분석합니다.
+                ※ PER/PBR/배당 데이터는 네이버 파이낸스 API에서 제공됩니다.
               </p>
             </div>
           </div>

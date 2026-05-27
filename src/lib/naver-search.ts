@@ -72,37 +72,54 @@ async function search(
   return res.json();
 }
 
+/**
+ * 검색어 생성: 티커만 사용 (회사명은 너무 일반적인 단어 포함 가능성)
+ * 예: AAPL → "AAPL 주식" (Apple이라는 일반명사 회피)
+ */
+function buildQuery(ticker: string): string {
+  return `${ticker} 주식`;
+}
+
 /** 주식 티커 관련 네이버 카페글 검색 */
 export async function searchCafeArticles(
   ticker: string,
-  companyName: string,
+  _companyName: string,
   display = 10
 ): Promise<NaverSearchItem[]> {
-  const query = `${ticker} ${companyName} 주식`;
-  const result = await search("cafearticle", query, display, 1, "date");
+  const result = await search("cafearticle", buildQuery(ticker), display, 1, "date");
   return result.items || [];
 }
 
 /** 주식 티커 관련 네이버 블로그 검색 */
 export async function searchBlogPosts(
   ticker: string,
-  companyName: string,
+  _companyName: string,
   display = 10
 ): Promise<NaverSearchItem[]> {
-  const query = `${ticker} ${companyName} 주식`;
-  const result = await search("blog", query, display, 1, "date");
+  const result = await search("blog", buildQuery(ticker), display, 1, "date");
   return result.items || [];
 }
 
-/** 주식 티커 관련 네이버 뉴스 검색 */
+/** 주식 티커 관련 네이버 뉴스 검색 (뉴스는 회사명으로 검색하는 게 더 정확) */
 export async function searchNews(
   ticker: string,
   companyName: string,
   display = 10
 ): Promise<NaverSearchItem[]> {
-  const query = `${ticker} ${companyName} 주식`;
-  const result = await search("news", query, display, 1, "date");
-  return result.items || [];
+  // 뉴스는 회사명 검색이 더 나음 (영문 ticker는 뉴스에서 잘 안 쓰임)
+  const queries = [
+    `${ticker} 주식`,
+    `${companyName}`,
+  ];
+  const results = await Promise.all(
+    queries.map((q) => search("news", q, Math.ceil(display / queries.length), 1, "date").catch(() => ({ items: [] as NaverSearchItem[] })))
+  );
+  const seen = new Set<string>();
+  return results.flat().flatMap((r) => r.items || []).filter((item) => {
+    if (seen.has(item.link)) return false;
+    seen.add(item.link);
+    return true;
+  });
 }
 
 /** 세 가지 소스(카페/블로그/뉴스)를 한꺼번에 조회 */

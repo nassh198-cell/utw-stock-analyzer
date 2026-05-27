@@ -11,9 +11,12 @@ interface ScoreConfig {
 }
 
 const SCORE_CONFIGS: ScoreConfig[] = [
-  { name: "52주 변화율", weight: 40, lowerBetter: true, idealMin: -0.40, idealMax: -0.05, maxReasonable: 0.50, metricKey: "fiftyTwoWeekChange" },
-  { name: "Beta", weight: 30, lowerBetter: true, idealMin: 0.3, idealMax: 1.0, maxReasonable: 2.5, metricKey: "beta" },
-  { name: "현재가 안정성", weight: 30, lowerBetter: true, idealMin: 10, idealMax: 200, maxReasonable: 500, metricKey: "price" },
+  { name: "52주 변화율", weight: 25, lowerBetter: true, idealMin: -0.40, idealMax: -0.05, maxReasonable: 0.50, metricKey: "fiftyTwoWeekChange" },
+  { name: "PER (주가수익비율)", weight: 25, lowerBetter: true, idealMin: 5, idealMax: 15, maxReasonable: 40, metricKey: "peRatio" },
+  { name: "PBR (주가순자산비율)", weight: 20, lowerBetter: true, idealMin: 0.5, idealMax: 1.5, maxReasonable: 5, metricKey: "pbRatio" },
+  { name: "Beta (변동성)", weight: 15, lowerBetter: true, idealMin: 0.3, idealMax: 1.0, maxReasonable: 2.5, metricKey: "beta" },
+  { name: "배당수익률", weight: 10, lowerBetter: false, idealMin: 1.0, idealMax: 4.0, maxReasonable: 8, metricKey: "dividendYield" },
+  { name: "현재가 안정성", weight: 5, lowerBetter: true, idealMin: 10, idealMax: 200, maxReasonable: 500, metricKey: "price" },
 ];
 
 function scoreMetric(

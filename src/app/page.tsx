@@ -210,6 +210,8 @@ export default function Home() {
                   <th className="px-6 py-3 font-medium">#</th>
                   <th className="px-6 py-3 font-medium">종목</th>
                   <th className="px-6 py-3 font-medium">섹터</th>
+                  <th className="px-6 py-3 font-medium text-right">PER</th>
+                  <th className="px-6 py-3 font-medium text-right">배당</th>
                   <th className="px-6 py-3 font-medium text-right">가격</th>
                   <th className="px-6 py-3 font-medium text-right">점수</th>
                 </tr>
@@ -236,6 +238,12 @@ export default function Home() {
                       <span className="text-xs bg-slate-800 text-slate-300 px-2 py-1 rounded">
                         {stock.sector}
                       </span>
+                    </td>
+                    <td className="px-6 py-4 text-right text-sm text-slate-300">
+                      {stock.peRatio != null ? stock.peRatio.toFixed(1) : "-"}
+                    </td>
+                    <td className="px-6 py-4 text-right text-sm text-slate-300">
+                      {stock.dividendYield != null ? `${stock.dividendYield.toFixed(1)}%` : "-"}
                     </td>
                     <td className="px-6 py-4 text-right text-sm">
                       ${stock.price?.toFixed(2) ?? "-"}

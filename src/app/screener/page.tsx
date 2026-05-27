@@ -7,7 +7,7 @@ import { Search, RefreshCw, ChevronDown, ChevronUp, X, AlertCircle } from "lucid
 import ScoreBadge from "@/components/ScoreBadge";
 import { StockSummary } from "@/types/stock";
 
-type SortField = "valuationScore" | "price" | "name" | "symbol";
+type SortField = "valuationScore" | "price" | "name" | "symbol" | "peRatio" | "pbRatio" | "dividendYield";
 type SortOrder = "asc" | "desc";
 
 function ScreenerContent() {
@@ -225,6 +225,24 @@ function ScreenerContent() {
                   <th className="px-6 py-3 font-medium">섹터</th>
                   <th
                     className="px-6 py-3 font-medium text-right cursor-pointer hover:text-white"
+                    onClick={() => handleSort("peRatio")}
+                  >
+                    PER <SortIcon field="peRatio" />
+                  </th>
+                  <th
+                    className="px-6 py-3 font-medium text-right cursor-pointer hover:text-white"
+                    onClick={() => handleSort("pbRatio")}
+                  >
+                    PBR <SortIcon field="pbRatio" />
+                  </th>
+                  <th
+                    className="px-6 py-3 font-medium text-right cursor-pointer hover:text-white"
+                    onClick={() => handleSort("dividendYield")}
+                  >
+                    배당 <SortIcon field="dividendYield" />
+                  </th>
+                  <th
+                    className="px-6 py-3 font-medium text-right cursor-pointer hover:text-white"
                     onClick={() => handleSort("price")}
                   >
                     가격 <SortIcon field="price" />
@@ -259,6 +277,15 @@ function ScreenerContent() {
                         {stock.sector}
                       </span>
                     </td>
+                    <td className="px-6 py-3.5 text-right text-sm text-slate-300">
+                      {stock.peRatio != null ? stock.peRatio.toFixed(1) : "-"}
+                    </td>
+                    <td className="px-6 py-3.5 text-right text-sm text-slate-300">
+                      {stock.pbRatio != null ? stock.pbRatio.toFixed(2) : "-"}
+                    </td>
+                    <td className="px-6 py-3.5 text-right text-sm text-slate-300">
+                      {stock.dividendYield != null ? `${stock.dividendYield.toFixed(1)}%` : "-"}
+                    </td>
                     <td className="px-6 py-3.5 text-right text-sm">
                       ${stock.price?.toFixed(2) ?? "-"}
                     </td>
@@ -274,7 +301,7 @@ function ScreenerContent() {
 
                 {stocks.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="px-6 py-12 text-center text-slate-500">
+                    <td colSpan={8} className="px-6 py-12 text-center text-slate-500">
                       <Search className="w-8 h-8 mx-auto mb-2 opacity-50" />
                       <p>검색 결과가 없습니다.</p>
                       <p className="text-xs mt-1">검색어를 확인하거나 필터를 초기화해보세요.</p>

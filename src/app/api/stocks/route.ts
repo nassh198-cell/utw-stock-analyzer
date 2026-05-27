@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { STOCK_UNIVERSE, SECTORS } from "@/lib/stock-universe";
 import { fetchStockMetrics } from "@/lib/yahoo-finance";
+import { fetchNaverFundamentals } from "@/lib/naver-finance";
 import { calculateValuationScore } from "@/lib/valuation";
-import { StockScreenerQuery, StockSummary } from "@/types/stock";
+import { StockSummary } from "@/types/stock";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -33,7 +34,7 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // Fetch metrics for all filtered stocks (in parallel, with concurrency limit)
+  // Fetch metrics from Yahoo Finance + Naver Finance in parallel
   const batchSize = 20;
   const results: StockSummary[] = [];
 
@@ -41,8 +42,20 @@ export async function GET(request: NextRequest) {
     const batch = filtered.slice(i, i + batchSize);
     const batchResults = await Promise.all(
       batch.map(async (stock) => {
-        const metrics = await fetchStockMetrics(stock.symbol);
+        // Fetch both data sources in parallel
+        const [metrics, naver] = await Promise.all([
+          fetchStockMetrics(stock.symbol),
+          fetchNaverFundamentals(stock.symbol).catch(() => null),
+        ]);
         if (!metrics) return null;
+
+        // Merge Naver fundamental data into metrics
+        if (naver) {
+          if (naver.per !== null) metrics.peRatio = naver.per;
+          if (naver.pbr !== null) metrics.pbRatio = naver.pbr;
+          if (naver.eps !== null) metrics.eps = naver.eps;
+          if (naver.dividendYield !== null) metrics.dividendYield = naver.dividendYield;
+        }
 
         const score = calculateValuationScore(metrics);
 
@@ -51,7 +64,7 @@ export async function GET(request: NextRequest) {
           name: stock.name,
           sector: stock.sector,
           price: metrics.price,
-          marketCap: metrics.price * 1, // placeholder - real market cap from API
+          marketCap: naver?.marketCap ?? metrics.price * 1,
           peRatio: metrics.peRatio,
           pbRatio: metrics.pbRatio,
           psRatio: metrics.psRatio,
@@ -66,9 +79,6 @@ export async function GET(request: NextRequest) {
 
     results.push(...batchResults.filter((r): r is StockSummary => r !== null));
   }
-
-  // Remove market cap placeholder - recompute with actual data
-  // (We skip this for now as it requires additional API calls)
 
   // Filter by score
   let finalResults = results;

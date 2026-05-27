@@ -1,14 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ExternalLink, RefreshCw, MessageSquare, Newspaper, FileText } from "lucide-react";
+import { ExternalLink, RefreshCw, Newspaper } from "lucide-react";
 
 interface CommunityPost {
   title: string;
   description: string;
   link: string;
-  source: "cafe" | "blog" | "news";
-  author?: string;
+  source: string;
   date?: string;
   sentiment: "positive" | "negative" | "neutral";
 }
@@ -21,26 +20,8 @@ interface CommunityData {
   posts: CommunityPost[];
 }
 
-function SourceIcon({ source }: { source: string }) {
-  switch (source) {
-    case "cafe":
-      return <MessageSquare className="w-3.5 h-3.5 text-orange-400" />;
-    case "blog":
-      return <FileText className="w-3.5 h-3.5 text-blue-400" />;
-    case "news":
-      return <Newspaper className="w-3.5 h-3.5 text-green-400" />;
-    default:
-      return <MessageSquare className="w-3.5 h-3.5 text-slate-400" />;
-  }
-}
-
-function SourceLabel({ source }: { source: string }) {
-  switch (source) {
-    case "cafe": return "카페";
-    case "blog": return "블로그";
-    case "news": return "뉴스";
-    default: return source;
-  }
+function SourceIcon() {
+  return <Newspaper className="w-3.5 h-3.5 text-blue-400" />;
 }
 
 function SentimentBadge({ sentiment }: { sentiment: string }) {
@@ -194,13 +175,8 @@ export default function CommunitySection({
             <div className="flex items-start justify-between gap-2">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5 mb-1">
-                  <SourceIcon source={post.source} />
-                  <span className="text-xs text-slate-500">
-                    {SourceLabel({ source: post.source })}
-                  </span>
-                  {post.author && (
-                    <span className="text-xs text-slate-600">{post.author}</span>
-                  )}
+                  <SourceIcon />
+                  <span className="text-xs text-slate-500">{post.source}</span>
                 </div>
                 <h4
                   className="text-sm font-medium text-white group-hover:text-blue-400 transition-colors truncate"
@@ -221,7 +197,7 @@ export default function CommunitySection({
 
       {posts.length === 0 && (
         <p className="text-sm text-slate-500 text-center py-4">
-          최근 커뮤니티 게시글이 없습니다.
+          관련 뉴스를 찾을 수 없습니다.
         </p>
       )}
     </div>
